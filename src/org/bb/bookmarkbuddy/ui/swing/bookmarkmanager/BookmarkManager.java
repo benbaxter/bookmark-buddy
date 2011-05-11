@@ -17,6 +17,7 @@ import java.util.Iterator;
 import javax.swing.*;
 
 import org.bb.bookmarkbuddy.io.file.FileBookmarkReader;
+import org.bb.bookmarkbuddy.io.file.FileBookmarkWriter;
 import org.bb.bookmarkbuddy.model.Bookmark;
 import org.bb.bookmarkbuddy.model.BookmarkList;
 
@@ -31,25 +32,10 @@ public class BookmarkManager extends JFrame
 	
 	
 	
-	public BookmarkManager()
+	public BookmarkManager(BookmarkList bookmarks)
 	{
-		//start the program
-		String userHomeDir = System.getProperty("user.home");
-		File file = new File( userHomeDir, "links.txt" );
-		if( !file.exists() )
-		{
-			String databaseName = "/database/links.txt";
-			URL url = BookmarkManager.class.getResource(databaseName);
-			try {
-				file = new File(url.toURI());
-			} catch (URISyntaxException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		System.out.println(file.getAbsolutePath());
-		bookmarks = new FileBookmarkReader(file).readBookmarks();
-		
+		this.bookmarks = bookmarks;
+
 		String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 		try
 		{
@@ -138,52 +124,24 @@ public class BookmarkManager extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				//TODO after writer is written
-//				File file;
-//				try {
-//					file = getDatabaseFile();
-//					exitProgram(file);
-//				} catch (URISyntaxException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//					System.exit(-1);
-//				}
-				System.exit(0);
+				exitProgram();
 			}
-		} );	
+		} );
+		
+		//Set some attributes to the frame
+		setTitle("Bookmark Manager");
+		setSize(400, 150);
+		setLocationRelativeTo(null);
+		pack();
+		setResizable(false);
+		setVisible(true);
 		
 	}
 	
-	public static void main(String[] args) 
+	public void exitProgram()
 	{
-		 BookmarkManager application = new BookmarkManager();
-		 application.setTitle("Bookmark Manager");
-		 application.setSize(400, 150);
-		 application.setLocationRelativeTo(null);
-		 application.pack();
-		 application.setResizable(false);
-		 application.setVisible(true);
+		new FileBookmarkWriter().writeBookmarks(bookmarks);
 	}
-	
-	//export to file writer dude
-//	public void exitProgram(File file)
-//	{
-//		try
-//		{
-//			PrintWriter save = new PrintWriter(new FileWriter( file ));
-//			for( String label : mapOfBookmarks.keySet() )
-//			{
-//				save.println(label + "\t" + mapOfBookmarks.get(label));
-//			}
-//			save.close();
-//		}
-//		catch(IOException ex) 
-//		{
-//			JOptionPane.showMessageDialog(null, "Error -- Unable to open or write to backup file",
-//					"Error", JOptionPane.ERROR_MESSAGE);
-//			System.exit(1);
-//		}
-//	}
 		
 	public void addToDatabase()
 	{
@@ -235,12 +193,12 @@ public class BookmarkManager extends JFrame
 		{
 			if( (Boolean) tableModel.getValueAt(i, 2) == true)
 			{
-				String urlText = (String) tableModel.getValueAt(i, 1);
-				URI url;
+//				String urlText = (String) tableModel.getValueAt(i, 1);
+				URI uri;
 				try {
-					url = new URI(urlText);
-					System.out.println(url);
-					desktop.browse(url);
+					uri = ((URL) tableModel.getValueAt(i, 1)).toURI();
+					System.out.println(uri);
+					desktop.browse(uri);
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
