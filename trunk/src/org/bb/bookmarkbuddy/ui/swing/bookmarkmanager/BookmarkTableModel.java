@@ -1,6 +1,8 @@
 package org.bb.bookmarkbuddy.ui.swing.bookmarkmanager;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -12,17 +14,30 @@ import org.bb.bookmarkbuddy.model.BookmarkList;
 class BookmarkTableModel extends AbstractTableModel {
 	
 	private BookmarkList bookmarks;
+	private List<Boolean> selected;
 	private String[] columns = { "Label", "URL", "Select" };
-	
-	public Class getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-    }
 	
 	public BookmarkTableModel(BookmarkList bookmarks)
 	{
 		this.bookmarks = bookmarks;
+		this.selected = new ArrayList<Boolean>(bookmarks.size());
+		for( Boolean val : selected )
+		{
+			val = (Boolean)false;
+		}
 	}
 
+	public Class getColumnClass(int c) {
+        return getValueAt(0, c).getClass();
+    }
+	
+	public boolean isCellEditable(int row, int col)
+	{
+		if( col == 2 ) 
+			return true;
+		return false;
+	}
+	
 	@Override
 	public int getColumnCount() {
 		return columns.length;
@@ -50,6 +65,14 @@ class BookmarkTableModel extends AbstractTableModel {
 				bookmark.setUrl((URL) value);
 				break;
 			case 2:
+				if( selected.size() < bookmarks.size() )
+				{
+					selected.add(false);
+				}
+				else
+				{
+					selected.set(row, !(Boolean) getValueAt(row, 2));
+				}
 				break;
 		}
 	}
@@ -64,7 +87,11 @@ class BookmarkTableModel extends AbstractTableModel {
 			case 1:
 				return bookmark.getUrl();
 			case 2:
-				return false;
+				while( selected.size() < bookmarks.size() )
+				{
+					selected.add(false);
+				}
+				return selected.get(row);
 		}
 		return null;
 	}
