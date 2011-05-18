@@ -189,6 +189,8 @@ public class BookmarkManager extends JFrame
 	{
 		Desktop desktop = Desktop.getDesktop();
 		BookmarkTableModel tableModel = (BookmarkTableModel) linksTable.getModel();
+		linksTable.clearSelection();
+//		linksTable.getSelectedRow() != -1
 		for(int i = 0; i < tableModel.getRowCount(); ++i)
 		{
 			if( (Boolean) tableModel.getValueAt(i, 2) == true)
