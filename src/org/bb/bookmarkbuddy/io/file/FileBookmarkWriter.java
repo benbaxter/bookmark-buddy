@@ -17,7 +17,7 @@ public class FileBookmarkWriter implements BookmarkWriter{
 	public void writeBookmarks(BookmarkList bookmarks) 
 	{
 		try {
-			String userHomeDir = System.getProperty("user.home");
+			String userHomeDir = System.getProperty("user.home") + "/bookmark-buddy/";
 			File file = new File(userHomeDir, "links.txt");
 			PrintWriter save = new PrintWriter(new FileWriter(file));
 			for (Bookmark bookmark : bookmarks) {
