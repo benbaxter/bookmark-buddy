@@ -8,10 +8,22 @@ import java.util.List;
 public class BookmarkList implements Iterable<Bookmark>{
 
 	List<Bookmark> bookmarks;
+	List<BookmarkListListener> listeners;
 	
 	public BookmarkList()
 	{
 		bookmarks = new ArrayList<Bookmark>();
+		listeners = new ArrayList<BookmarkListListener>(3);
+	}
+	
+	public void addListener(BookmarkListListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void removeListener(BookmarkListListener listener)
+	{
+		listeners.remove(listener);
 	}
 	
 	public void addBookmark(Bookmark bookmark)
@@ -22,11 +34,23 @@ public class BookmarkList implements Iterable<Bookmark>{
 		if( index > bookmarks.size() )
 			index = bookmarks.size();
 		bookmarks.add(index, bookmark);
+		for ( BookmarkListListener listener : listeners )
+		{
+			listener.bookmarkAdded(this, bookmark, index);
+		}
 	}
 	
 	public void removeBookmark(Bookmark bookmark)
 	{
-		bookmarks.remove(bookmark);
+		int index = bookmarks.indexOf(bookmark);
+		if ( index >= 0 )
+		{
+			bookmarks.remove(bookmark);
+			for ( BookmarkListListener listener : listeners )
+			{
+				listener.bookmarkRemoved(this, bookmark, index);
+			}
+		}
 	}
 	
 	public int size()

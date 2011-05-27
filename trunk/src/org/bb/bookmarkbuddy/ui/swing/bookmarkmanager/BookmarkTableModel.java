@@ -8,6 +8,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.bb.bookmarkbuddy.model.Bookmark;
 import org.bb.bookmarkbuddy.model.BookmarkList;
+import org.bb.bookmarkbuddy.model.BookmarkListListener;
 
 
 @SuppressWarnings("serial")
@@ -20,6 +21,20 @@ class BookmarkTableModel extends AbstractTableModel {
 	public BookmarkTableModel(BookmarkList bookmarks)
 	{
 		this.bookmarks = bookmarks;
+		bookmarks.addListener( new BookmarkListListener() {
+			@Override
+			public void bookmarkRemoved(BookmarkList bookmarks,
+					Bookmark removedBookmark, int oldIndex) {
+				fireTableRowsDeleted(oldIndex, oldIndex);
+			}
+			
+			@Override
+			public void bookmarkAdded(BookmarkList bookmarks, Bookmark newBookmark,
+					int index) {
+				fireTableRowsInserted(index, index);
+			}
+		} );
+		
 		this.selected = new ArrayList<Boolean>(bookmarks.size());
 		for( Boolean val : selected )
 		{
@@ -75,6 +90,7 @@ class BookmarkTableModel extends AbstractTableModel {
 				}
 				break;
 		}
+		fireTableRowsUpdated(row, row);
 	}
 
 	@Override
