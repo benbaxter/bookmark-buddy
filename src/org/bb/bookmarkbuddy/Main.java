@@ -1,10 +1,14 @@
 package org.bb.bookmarkbuddy;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
+
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.bb.bookmarkbuddy.io.file.FileBookmarkReader;
+import org.bb.bookmarkbuddy.io.file.FileBookmarkWriter;
 import org.bb.bookmarkbuddy.model.BookmarkList;
 import org.bb.bookmarkbuddy.ui.swing.bookmarkmanager.BookmarkManager;
 import org.bb.bookmarkbuddy.ui.systemtray.BookmarkSystemTray;
@@ -16,38 +20,58 @@ public class Main {
 	
 	public static void main(String[] args) {
 
-		if( args.length > 0)
-		{
-			for( String arg : args)
-				System.out.println(arg);
-			systemtray = Boolean.valueOf(args[0].split("=")[1]);
-		}
+		systemtray = Boolean.getBoolean("org.bb.bookmarkbuddy.systemtray");
+
+//		if( args.length > 0)
+//		{
+//			for( String arg : args)
+//				System.out.println(arg);
+//			systemtray = Boolean.valueOf(args[0].split("=")[1]);
+//		}
+		
 		System.out.println(systemtray);
+		
 		String userHomeDir = System.getProperty("user.home");
 		File homedir = new File(userHomeDir + "/bookmark-buddy");
 		if(!homedir.exists())
 			homedir.mkdir();
-		System.out.println(homedir.getAbsolutePath());
+
 		File file = new File(homedir, "links.txt");
-		
-		//default file to use when the generated file does not exist.
-		if (!file.exists()) {
-			String databaseName = "/database/links.txt";
-			URL url = BookmarkManager.class.getResource(databaseName);
-			try {
-				file = new File(url.toURI());
-			} catch (URISyntaxException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		if( file.exists() ) 
+		{
+			bookmarks = new FileBookmarkReader(file).readBookmarks();
 		}
-		System.out.println(file.getAbsolutePath());
-		bookmarks = new FileBookmarkReader(file).readBookmarks();
-	
-		BookmarkManager application = new BookmarkManager(bookmarks);
+		else
+		{
+			bookmarks = new BookmarkList();
+		}
+		try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+		BookmarkManager bookmarkManager = new BookmarkManager(bookmarks);
+		bookmarkManager.addWindowListener( new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+ 				new FileBookmarkWriter().writeBookmarks(bookmarks);
+				if( !systemtray )
+				{
+					System.exit(0);
+				}
+			}
+		} );
+		
 		if( systemtray )
 		{
-			BookmarkSystemTray sysTray = new BookmarkSystemTray(bookmarks);
+			BookmarkSystemTray sysTray = new BookmarkSystemTray(bookmarks, bookmarkManager);
 		}
 		
 

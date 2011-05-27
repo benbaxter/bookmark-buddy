@@ -1,9 +1,4 @@
 package org.bb.bookmarkbuddy.ui.swing.bookmarkmanager;
-/*DataBaseGui.java
- * Benjamin Baxter
- * 4/2/09
- * has a gui interface instead of all Joptionpane
- */
 
 import java.awt.*;
 import java.awt.event.*;
@@ -35,18 +30,6 @@ public class BookmarkManager extends JFrame
 	public BookmarkManager(BookmarkList bookmarks)
 	{
 		this.bookmarks = bookmarks;
-
-		String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-		try
-		{
-			UIManager.setLookAndFeel(windows);
-			SwingUtilities.updateComponentTreeUI(this);
-		}
-		catch(Exception e) 
-		{
-			//If we do not get the windows look and feel, then oh well...
-		}
-		
 		
 		TFFocusHandler tfFocusHandler = new TFFocusHandler();
 		ButtonHandler bh = new ButtonHandler();
@@ -119,14 +102,7 @@ public class BookmarkManager extends JFrame
 		add(pnlCenter, BorderLayout.NORTH);
 		add(pnlTable, BorderLayout.CENTER);
 		add(pnlSouth, BorderLayout.SOUTH);
-		
-		addWindowListener( new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				exitProgram();
-			}
-		} );
+
 		
 		//Set some attributes to the frame
 		setTitle("Bookmark Manager");
@@ -136,11 +112,6 @@ public class BookmarkManager extends JFrame
 		setResizable(false);
 		setVisible(true);
 		
-	}
-	
-	public void exitProgram()
-	{
-		new FileBookmarkWriter().writeBookmarks(bookmarks);
 	}
 		
 	public void addToDatabase()
@@ -161,9 +132,6 @@ public class BookmarkManager extends JFrame
 			
 			System.out.println(url);
 			bookmarks.addBookmark( new Bookmark(label, url));
-			//TODO: Add listener on bookmarks? maybe
-			BookmarkTableModel tableModel = (BookmarkTableModel) linksTable.getModel();
-			tableModel.fireTableDataChanged();
 		}
 		catch ( MalformedURLException mue )
 		{
