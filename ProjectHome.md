@@ -1,0 +1,1 @@
+This application will contain a desktop component with a integrated system tray application, a web component, and possible a mobile feature as well... Its a work to be in progress :-)
